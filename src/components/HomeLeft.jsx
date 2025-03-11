@@ -37,69 +37,42 @@ const HomeLeft = ({ renderEnter }) => {
         <table className="table-auto w-full border-collapse border border-gray-300 mt-4">
           <thead>
             <tr className="bg-gray-200">
-              <th className="border border-gray-300 px-4 py-2">Id</th>
               <th className="border border-gray-300 px-4 py-2">Turi</th>
               <th className="border border-gray-300 px-4 py-2">
                 Davlat raqami
               </th>
-              <th className="border border-gray-300 px-4 py-2">KPP ID</th>
-              <th className="border border-gray-300 px-4 py-2">Kamera IP</th>
               <th className="border border-gray-300 px-4 py-2">Xabar</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td className="border border-gray-300 px-4 py-2">
-                {renderEnter?.id}
-              </td>
-              <td className="border border-gray-300 px-4 py-2">
                 {renderEnter?.type}
               </td>
               <td className="border border-gray-300 px-4 py-2">
                 {renderEnter?.plate}
               </td>
-              <td className="border border-gray-300 px-4 py-2">
-                {renderEnter?.kpp_id}
-              </td>
-              <td className="border border-gray-300 px-4 py-2">
-                {renderEnter?.camera_ip}
-              </td>
+
               <td className="border border-gray-300 px-4 py-2">
                 {renderEnter?.message}
               </td>
             </tr>
           </tbody>
+          {/* <img
+            src={`http://localhost:8000/storage/${renderEnter.file}car.jpg`}
+            className="w-8 h-8"
+            alt={renderEnter.file}
+          /> */}
         </table>
       )}
-
       <div className="overflow-x-auto mt-8">
         <h2 className="text-2xl font-bold mb-4">Oxiri kirgan Avtomabillar</h2>
         <table className="table w-full border-collapse border border-gray-300">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border border-gray-300 px-4 py-2">ID</th>
-              <th className="border border-gray-300 px-4 py-2">Plate</th>
-              <th className="border border-gray-300 px-4 py-2">File</th>
-              <th className="border border-gray-300 px-4 py-2">Event Date</th>
-            </tr>
-          </thead>
           <tbody>
-            {data?.map((item, index) => (
+            {data?.map((item) => (
               <tr key={item.id} className="hover:bg-gray-50">
-                <td className="border border-gray-300 px-4 py-2">
-                  {index + 1}
-                </td>
-                <td className="border border-gray-300 px-4 py-2">
-                  {item.plate}
-                </td>
-                <td className="border border-gray-300 px-4 py-2">
-                  <img
-                    src={`http://localhost:8000/storage/${item.file}car.jpg`}
-                    className="w-8 h-8"
-                    alt={item.file}
-                  />
-                </td>
-                <td className="border border-gray-300 px-4 py-2">
+                <td className="border border-gray-300 px-4 py-2 text-2xl text-center">
+                  {item.plate} <br />
                   {item.event_date}
                 </td>
               </tr>
