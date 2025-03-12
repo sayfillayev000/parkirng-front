@@ -2,6 +2,9 @@ import { useState } from "react";
 import { Navbar } from "../components";
 import { useNavigate } from "react-router-dom";
 import api from "../api/api";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 
 const SearchCar = () => {
   const navigate = useNavigate();
@@ -18,7 +21,6 @@ const SearchCar = () => {
       setCars([]);
       return;
     }
-
     setLoading(true);
     setError("");
 
@@ -50,59 +52,66 @@ const SearchCar = () => {
     console.log(showModal.id);
     api
       .post("allow_exit", { id: showModal.id })
-      .then((res) => console.log(res))
-      .catch((err) => console.error(err));
+      .then((res) => {
+        toast.success(res.data.message);
+        console.log(res);
+      })
+      .catch((err) => {
+        toast.error(err.data.message);
+        console.error(err);
+      });
     setShowModal({ status: false, id: null });
     navigate("/");
   };
   return (
     <>
       <Navbar />
-      <div className="p-10">
-        <h1 className="text-5xl py-6 text-center">Avtomobilni Qidirish</h1>
-        <div className="max-w-2xl mx-auto bg-white p-10 rounded-lg shadow-lg">
-          <input
-            type="text"
-            placeholder="Avtomobil raqami (masalan, 636)"
-            className="input input-bordered w-full mb-6 text-center text-4xl h-20 rounded-3xl"
-            value={plate}
-            readOnly
-          />
-          {error && (
-            <p className="text-red-500 text-2xl mb-6 text-center">{error}</p>
-          )}
+      <div className="flex items-center justify-center h-[80%]">
+        <div className="p-6">
+          <h1 className="text-3xl py-3 text-center">Avtomobilni Qidirish</h1>
+          <div className="max-w-lg mx-auto  bg-white p-6 rounded-lg shadow-xl w-3xl">
+            <input
+              type="text"
+              placeholder="Avtomobil raqami (masalan, 636)"
+              className="input input-bordered w-full mb-3 text-center text-2xl h-14 rounded-xl"
+              value={plate}
+              readOnly
+            />
+            {error && (
+              <p className="text-red-500 text-lg mb-3 text-center">{error}</p>
+            )}
 
-          {/* Raqamli klaviatura */}
-          <div className="grid grid-cols-3 gap-8 mb-8">
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, "C", 0, "⌫"].map((item) => (
-              <button
-                key={item}
-                className="btn text-5xl shadow-lg bg-gray-100 hover:bg-gray-300 active:bg-blue-500 active:border-2 active:border-blue-700 transition-all duration-200 rounded-lg p-10 flex justify-center items-center"
-                onClick={() => {
-                  if (item === "⌫") {
-                    handleDelete();
-                  } else if (item === "C") {
-                    setPlate("");
-                  } else {
-                    handleNumberClick(item);
-                  }
-                }}
-              >
-                {item}
-              </button>
-            ))}
+            {/* Raqamli klaviatura */}
+            <div className="grid grid-cols-3 gap-4 mb-4">
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9, "C", 0, "⌫"].map((item) => (
+                <button
+                  key={item}
+                  className="btn text-3xl shadow-lg bg-gray-100 hover:bg-gray-300 active:bg-blue-500 active:border-2 active:border-blue-700 transition-all duration-200 rounded-lg p-6 flex justify-center items-center"
+                  onClick={() => {
+                    if (item === "⌫") {
+                      handleDelete();
+                    } else if (item === "C") {
+                      setPlate("");
+                    } else {
+                      handleNumberClick(item);
+                    }
+                  }}
+                >
+                  {item}
+                </button>
+              ))}
+            </div>
+
+            <button
+              className="btn btn-primary w-full text-3xl py-4 rounded-xl flex justify-center items-center mt-4"
+              onClick={handleSearch}
+              disabled={loading}
+            >
+              {loading ? "Qidirilmoqda..." : "Qidirish"}
+            </button>
           </div>
-
-          <button
-            className="btn btn-primary w-full text-5xl py-8 rounded-xl flex justify-center items-center mt-8"
-            onClick={handleSearch}
-            disabled={loading}
-          >
-            {loading ? "Qidirilmoqda..." : "Qidirish"}
-          </button>
         </div>
       </div>
-
       {/* Modal */}
       {modalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50">
@@ -167,6 +176,7 @@ const SearchCar = () => {
           </div>
         </div>
       )}
+      <ToastContainer />
     </>
   );
 };

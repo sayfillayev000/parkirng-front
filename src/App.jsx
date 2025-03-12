@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createHashRouter, RouterProvider } from "react-router-dom";
 import { CashierReport, CashiersCards, Error, Kpp, SearchCar } from "./pages";
 import Home from "./pages/Home";
 import { useState } from "react";
@@ -37,7 +37,7 @@ function App() {
     return [...commonRoutes, ...userRoutes];
   };
   // { path: "*", element: <Error /> }
-  const routes = createBrowserRouter(createRoutes(token));
+  const routes = createHashRouter(createRoutes(token));
 
   return <RouterProvider router={routes} />;
 }

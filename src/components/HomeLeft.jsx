@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import api from "../api/api";
+import axios from "axios";
 
 const HomeLeft = ({ renderEnter }) => {
   const [data, setData] = useState(null);
@@ -14,7 +15,10 @@ const HomeLeft = ({ renderEnter }) => {
   }, [renderEnter]);
 
   const handlePrint = () => {
-    window.print();
+    axios
+      .post(import.meta.env.VITE_PRINT_URL, print)
+      .then((res) => console.log(res))
+      .catch((err) => console.error(err));
   };
 
   return (

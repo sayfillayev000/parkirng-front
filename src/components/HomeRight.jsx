@@ -4,6 +4,8 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import { PaymentType } from "./modal";
+import { formatPrintRow, printerData } from "../utils/constants";
+import axios from "axios";
 
 const HomeRight = ({ renderExit }) => {
   const [payType, setPayType] = useState(null);
@@ -12,10 +14,12 @@ const HomeRight = ({ renderExit }) => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [network, setNetwork] = useState(null);
   const [data, setData] = useState(null);
 
   useEffect(() => {
     setData(renderExit);
+    console.log(data);
   }, [renderExit]);
 
   useEffect(() => {
@@ -31,6 +35,10 @@ const HomeRight = ({ renderExit }) => {
         setError(null);
       })
       .catch((err) => {
+        if (err?.code == "ERR_NETWORK" || err?.message == "Network Error") {
+          console.log("aaaaa");
+          setNetwork("Server bilan aloqa yo'q tarmoqqa ulanishni tekshiring");
+        }
         console.error(err);
         setError(err.response.data.message);
       })
@@ -48,7 +56,7 @@ const HomeRight = ({ renderExit }) => {
           setError("To'lov turini tanlang!");
           return;
         }
-        confirm(2);
+        confirm(2, true);
         break;
       case "no_check":
         if (!onChange) {
@@ -79,20 +87,34 @@ const HomeRight = ({ renderExit }) => {
         setIsOpen(false);
 
         if (res.status == 200) {
+          console.log(200);
+
           if (check) {
-            window.print();
+            console.log("check");
+
+            handlePrint();
           }
           setData(null);
         }
       })
       .catch((err) => {
         console.error(err);
-        setError(err.response.data.message);
+        setError(err.data.message);
         setIsOpen(false);
+        if (err.code == "ERR_NETWORK") {
+          setNetwork("Server bilan aloqa yo'q tarmoqqa ulanishni tekshiring");
+        }
       })
       .finally(() => setIsLoading(false));
   };
-
+  const handlePrint = () => {
+    axios
+      .post(import.meta.env.VITE_PRINT_URL, printerData(data), {
+        headers: { "Content-Type": "application/json" },
+      })
+      .then((res) => console.log(res))
+      .catch((err) => console.error(err));
+  };
   return (
     <div className="w-2/3 bg-white p-4 flex flex-col items-center rounded-lg shadow-md">
       <h1 className="text-2xl font-bold">ЧИҚИШ</h1>
@@ -239,10 +261,19 @@ const HomeRight = ({ renderExit }) => {
           </table>
         )
       ) : (
-        <div className="text-center mt-4 p-4 bg-yellow-100 text-yellow-700 rounded-lg shadow">
-          <h2 className="text-xl font-bold">Маълумот йўқ</h2>
-          <p className="text-lg">Ҳозирча маълумот келмади</p>
-        </div>
+        <>
+          <div className="text-center mt-4 p-4 bg-yellow-100 text-yellow-700 rounded-lg shadow">
+            <h2 className="text-xl font-bold">Маълумот йўқ</h2>
+            <p className="text-lg">Ҳозирча маълумот келмади</p>
+          </div>
+          {network && (
+            <div className=" flex justify-center pt-5">
+              <div className="text-red-500 bg-red-100 p-3 w-2xl text-center rounded-lg mb-4">
+                ❌ {network}
+              </div>
+            </div>
+          )}
+        </>
       )}
 
       {isOpen && (

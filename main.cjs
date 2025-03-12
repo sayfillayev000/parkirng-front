@@ -4,19 +4,28 @@ const isDev = !app.isPackaged;
 function createWindow() {
   const win = new BrowserWindow({
     fullscreen: true,
-    kiosk: true,
+    // kiosk: true,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
     },
   });
 
-  if (isDev) {
-    win.loadURL("http://localhost:5173");
-    win.webContents.openDevTools(); // DevTools'ni avtomatik ochish
-  } else {
-    // Production rejimi → build fayllarni yuklash
-    win.loadFile(path.join(__dirname, "dist/index.html"));
-  }
+  // if (isDev) {
+  //   win.loadURL("http://172.25.24.220:5173");
+  // } else {
+  //   // win.webContents.openDevTools();
+  // }
+  win.loadFile(path.join(__dirname, "dist/index.html"));
+  win.webContents.on("before-input-event", (event, input) => {
+    if (input.type === "keyDown" && input.key === "F12") {
+      if (win.webContents.isDevToolsOpened()) {
+        win.webContents.closeDevTools();
+      } else {
+        win.webContents.openDevTools();
+      }
+      event.preventDefault(); // F12 ni brauzerga uzatilishini to‘xtatadi
+    }
+  });
 }
 
 app.whenReady().then(() => {

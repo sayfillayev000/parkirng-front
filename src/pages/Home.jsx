@@ -65,9 +65,8 @@ const Home = () => {
 
   return (
     <>
-      {/* {"soket" + JSON.stringify(socketData)} */}
       <Navbar />
-      <div className="flex h-screen w-full">
+      <div className="flex h-[91.6%] w-full">
         <HomeLeft renderEnter={renderEnter} />
         <HomeRight renderExit={renderExit} />
       </div>
