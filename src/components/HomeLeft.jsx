@@ -14,22 +14,17 @@ const HomeLeft = ({ renderEnter }) => {
       .catch((err) => console.error(err));
   }, [renderEnter]);
 
-  const handlePrint = () => {
-    axios
-      .post(import.meta.env.VITE_PRINT_URL, print)
-      .then((res) => console.log(res))
-      .catch((err) => console.error(err));
-  };
+  const handlePrint = () => {};
 
   return (
     <div className="w-1/3 bg-gray-100 p-4 flex flex-col items-center text-center rounded-lg shadow-md">
       <h1 className="text-2xl font-bold">КИРИШ</h1>
-      <button
+      {/* <button
         onClick={handlePrint}
         className="btn btn-primary text-white px-6 py-3 mt-4 rounded-lg w-full"
       >
         КИРИШ БИЛЕТИНИ ПЕЧАТЬ КИЛИШ
-      </button>
+      </button> */}
       <button
         onClick={handlePrint}
         className="btn btn-secondary text-white px-6 py-3 mt-2 rounded-lg w-full"
@@ -69,7 +64,7 @@ const HomeLeft = ({ renderEnter }) => {
           /> */}
         </table>
       )}
-      <div className="overflow-x-auto mt-8">
+      <div className="overflow-x-auto mt-8 w-full">
         <h2 className="text-2xl font-bold mb-4">Oxiri kirgan Avtomabillar</h2>
         <table className="table w-full border-collapse border border-gray-300">
           <tbody>

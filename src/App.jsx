@@ -1,12 +1,16 @@
 import { createHashRouter, RouterProvider } from "react-router-dom";
 import { CashierReport, CashiersCards, Error, Kpp, SearchCar } from "./pages";
 import Home from "./pages/Home";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 function App() {
-  const [token, setToken] = useState(() => localStorage.getItem("token"));
+  const [user, setUser] = useState(null);
 
-  const createRoutes = (token) => {
+  useEffect(() => {
+    setUser(JSON.parse(sessionStorage.getItem("user")));
+  }, []);
+
+  const createRoutes = (user) => {
     const commonRoutes = [
       {
         path: "/cashiers",
@@ -32,12 +36,22 @@ function App() {
       ],
     };
 
-    const userRoutes = [...(token == null ? [] : roleBasedRoutes.user)];
+    const userRoutes = [
+      ...(user?.role === "casheir" ? roleBasedRoutes.user : []),
+    ];
 
-    return [...commonRoutes, ...userRoutes];
+    return [...commonRoutes, ...userRoutes, { path: "*", element: <Error /> }];
   };
-  // { path: "*", element: <Error /> }
-  const routes = createHashRouter(createRoutes(token));
+
+  // if (user === null) {
+  //   return (
+  //     <div className="flex justify-center items-center h-screen">
+  //       <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
+  //     </div>
+  //   );
+  // }
+
+  const routes = createHashRouter(createRoutes(user));
 
   return <RouterProvider router={routes} />;
 }

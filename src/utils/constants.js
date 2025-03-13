@@ -112,11 +112,7 @@ export const printerData = (data) => [
         "; Avtomobil raqami:" +
         data.plate +
         "; minut:" +
-        data.minutes +
-        "; kirgan vaqt;" +
-        data.enter_date +
-        "; chiqgan vaqt" +
-        data.exit_date
+        data.minutes
     ),
     font: "normal",
   },

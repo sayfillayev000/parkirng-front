@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import { PaymentType } from "./modal";
-import { formatPrintRow, printerData } from "../utils/constants";
+import { printerData } from "../utils/constants";
 import axios from "axios";
 
 const HomeRight = ({ renderExit }) => {

@@ -49,7 +49,6 @@ const SearchCar = () => {
   };
 
   const handleConfirm = () => {
-    console.log(showModal.id);
     api
       .post("allow_exit", { id: showModal.id })
       .then((res) => {
