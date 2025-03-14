@@ -107,14 +107,59 @@ const HomeRight = ({ renderExit }) => {
       })
       .finally(() => setIsLoading(false));
   };
-  const handlePrint = () => {
-    axios
-      .post(import.meta.env.VITE_PRINT_URL, printerData(data), {
-        headers: { "Content-Type": "application/json" },
-      })
-      .then((res) => console.log(res))
-      .catch((err) => console.error(err));
+  const handlePrint = async () => {
+    try {
+      const sendRequest = async () => {
+        return axios.post(import.meta.env.VITE_PRINT_URL, printerData(data), {
+          headers: { "Content-Type": "application/json" },
+        });
+      };
+
+      let response = await sendRequest();
+
+      // Agar 404 bo‘lsa, faqat BIR MARTA yana so‘rov yuboramiz
+      if (response.status === 404) {
+        toast.warning("Printer topilmadi, qayta tekshirilmoqda...");
+        response = await sendRequest();
+
+        // Agar yana 404 kelsa, aniq printer o‘chiq
+        if (response.status === 404) {
+          toast.error("Xatolik: Printer o'chiq yoki aloqa yo'q!");
+          return;
+        }
+      }
+
+      // Statuslarni tekshiramiz
+      switch (response.status) {
+        case 200:
+          toast.success("Chop etish muvaffaqiyatli amalga oshirildi!");
+          break;
+        case 401:
+          toast.error("Xatolik: Printerning qopqog'i ochiq!");
+          break;
+        case 402:
+          toast.error("Xatolik: Printerning tugmasi bosilib turibdi!");
+          break;
+        case 403:
+          toast.error("Xatolik: Printerda qog'oz tugadi!");
+          break;
+        case 405:
+          toast.error("Xatolik: Printerda noma'lum muammo!");
+          break;
+        case 406:
+          toast.error("Xatolik: Printer ma'lumotlarda xatolik bor!");
+          break;
+        case 407:
+          toast.error("Xatolik: Printer JSON format noto'g'ri!");
+          break;
+        default:
+          toast.error(`Printerda xatolik. Status: ${response.status}`);
+      }
+    } catch (err) {
+      toast.error(`Chek chop etishda tarmoq yoki server xatosi`);
+    }
   };
+
   return (
     <div className="w-2/3 bg-white p-4 flex flex-col items-center rounded-lg shadow-md">
       <h1 className="text-2xl font-bold">ЧИҚИШ</h1>

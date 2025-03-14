@@ -5,14 +5,24 @@ import api from "../api/api";
 import { useNavigate } from "react-router-dom";
 
 const CashiersCards = () => {
-  const [kpp, setKpp] = useState([]);
   const [cashiers, setCashiers] = useState([]);
   const [selectedCashier, setSelectedCashier] = useState(null);
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [user, setUser] = useState(JSON.parse(sessionStorage.getItem("user")));
   const navigate = useNavigate();
+  const [kpp, setKpp] = useState(
+    JSON.parse(localStorage.getItem("selectedKpp"))
+  );
 
+  useEffect(() => {
+    if (!kpp) {
+      navigate("/kpp");
+    } else if (user) {
+      navigate("/");
+    }
+  }, [user, kpp]);
   useEffect(() => {
     api
       .get("cashiers")
@@ -82,9 +92,7 @@ const CashiersCards = () => {
           />
         </svg>
       </a>
-      <h1 className="text-3xl py-4 text-center">
-        {kpp?.parking?.name} АВТОТУРАРГОҲ ТИЗИМГА КИРИШ
-      </h1>
+      <h1 className="text-3xl py-4 text-center">{kpp?.parking?.name}</h1>
       <h2 className="text-3xl font-bold mb-4 text-center">Kassirni tanlang</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {cashiers.map((cashier) => (

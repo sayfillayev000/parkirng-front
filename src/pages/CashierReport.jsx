@@ -75,11 +75,11 @@ const CashierReport = () => {
           </thead>
           <tbody>
             {data?.payments?.map((payment, index) => (
-              <tr key={payment.id}>
+              <tr key={payment.type}>
                 <td>{index + 1}</td>
-                <td>{payment.total} so'm</td>
-                <td>{payment.type}</td>
-                <td>{payment.date}</td>
+                <td>{payment?.total} so'm</td>
+                <td>{payment?.type}</td>
+                <td>{data?.now_date}</td>
               </tr>
             ))}
           </tbody>

@@ -7,6 +7,15 @@ const Kpp = () => {
   const [selectedKpp, setSelectedKpp] = useState(null);
   const navigate = useNavigate();
   const [error, setError] = useState(null);
+  const [kpp, setKpp] = useState(
+    JSON.parse(localStorage.getItem("selectedKpp"))
+  );
+
+  useEffect(() => {
+    if (kpp) {
+      navigate("/");
+    }
+  }, [kpp]);
 
   useEffect(() => {
     api

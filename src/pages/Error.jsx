@@ -1,6 +1,4 @@
 import { NavLink, useRouteError } from "react-router-dom";
-import api from "../api/api";
-import { useEffect } from "react";
 
 const Error = () => {
   const error = useRouteError();

@@ -1,59 +1,70 @@
 import { createHashRouter, RouterProvider } from "react-router-dom";
 import { CashierReport, CashiersCards, Error, Kpp, SearchCar } from "./pages";
 import Home from "./pages/Home";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 
-function App() {
+const App = () => {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    setUser(JSON.parse(sessionStorage.getItem("user")));
+    try {
+      const storedUser = sessionStorage.getItem("user");
+      if (storedUser) {
+        setUser(JSON.parse(storedUser));
+      }
+    } catch (error) {
+      console.error("Failed to parse user data:", error);
+      sessionStorage.removeItem("user");
+    }
   }, []);
 
-  const createRoutes = (user) => {
-    const commonRoutes = [
+  const commonRoutes = useMemo(
+    () => [
+      { path: "/", element: <Home />, errorElement: <Error /> },
       {
         path: "/cashiers",
         element: <CashiersCards />,
+        errorElement: <Error />,
       },
-      {
-        path: "/kpp",
-        element: <Kpp />,
-      },
-      { path: "/", element: <Home /> },
-    ];
+      { path: "/kpp", element: <Kpp />, errorElement: <Error /> },
+    ],
+    []
+  );
 
-    const roleBasedRoutes = {
-      user: [
-        {
-          path: "/search_car",
-          element: <SearchCar />,
-        },
-        {
-          path: "/cashier_report",
-          element: <CashierReport />,
-        },
-      ],
-    };
+  const userRoutes = useMemo(
+    () =>
+      user?.role === "cashier"
+        ? [
+            {
+              path: "/search_car",
+              element: <SearchCar />,
+              errorElement: <Error />,
+            },
+            {
+              path: "/cashier_report",
+              element: <CashierReport />,
+              errorElement: <Error />,
+            },
+          ]
+        : [],
+    [user]
+  );
 
-    const userRoutes = [
-      ...(user?.role === "casheir" ? roleBasedRoutes.user : []),
-    ];
+  // 🔥 Faqat user ma'lumotlari yuklangandan keyin marshrut yaratish
+  const routes = useMemo(
+    () => createHashRouter([...commonRoutes, ...userRoutes]),
+    [user, commonRoutes, userRoutes]
+  );
 
-    return [...commonRoutes, ...userRoutes, { path: "*", element: <Error /> }];
-  };
-
-  // if (user === null) {
-  //   return (
-  //     <div className="flex justify-center items-center h-screen">
-  //       <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
-  //     </div>
-  //   );
-  // }
-
-  const routes = createHashRouter(createRoutes(user));
+  // 🔄 User ma'lumotlari yuklanmaguncha yuklanish belgisi ko‘rsatish
+  if (user === null)
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <span className="loading loading-spinner loading-lg"></span>
+      </div>
+    );
 
   return <RouterProvider router={routes} />;
-}
+};
 
 export default App;

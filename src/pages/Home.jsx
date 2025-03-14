@@ -14,13 +14,10 @@ const Home = () => {
 
   useEffect(() => {
     const storedKpp = JSON.parse(localStorage.getItem("selectedKpp"));
+    const user = JSON.parse(sessionStorage.getItem("user"));
     if (!storedKpp) {
       navigate("/kpp");
-    } else {
-      setKpps(storedKpp);
-    }
-    const user = JSON.parse(sessionStorage.getItem("user"));
-    if (!user) {
+    } else if (!user) {
       navigate("/cashiers");
     }
   }, []);
