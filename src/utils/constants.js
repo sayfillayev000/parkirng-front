@@ -3,7 +3,7 @@ export const formatPrintRow = (key, value, totalLength = 42) => {
     totalLength - (String(key).length + String(value).length);
 
   if (spacesNeeded < 0) {
-    return keyValueString.slice(0, totalLength);
+    return String(key + value).slice(0, totalLength);
   }
   const keyValueFormatted = key + " ".repeat(spacesNeeded) + value;
   return keyValueFormatted;
@@ -117,3 +117,104 @@ export const printerData = (data) => [
     font: "normal",
   },
 ];
+
+export const printCashierData = (data) => {
+  const heading = [
+    {
+      type: "text",
+      align: "center",
+      body: JSON.parse(localStorage.getItem("selectedKpp"))?.name,
+      font: "large",
+    },
+    {
+      type: "text",
+      align: "center",
+      body: "Kassirning hisoboti",
+      font: "bold",
+    },
+    {
+      type: "text",
+      align: "center",
+      body: "\n",
+      font: "normal",
+    },
+    {
+      type: "text",
+      align: "center",
+      body: formatPrintRow("Kassir:", data?.name),
+      font: "normal",
+    },
+    {
+      type: "text",
+      align: "center",
+      body: "",
+      font: "normal",
+    },
+    {
+      type: "text",
+      align: "center",
+      body: formatPrintRow("Boshlanish vaqti:", data?.start_date),
+      font: "underline",
+    },
+    {
+      type: "text",
+      align: "center",
+      body: "",
+      font: "normal",
+    },
+    {
+      type: "text",
+      align: "center",
+      body: formatPrintRow("Tugash vaqti:", data?.now_date),
+      font: "underline",
+    },
+    {
+      type: "text",
+      align: "center",
+      body: "",
+      font: "normal",
+    },
+  ];
+
+  const payments =
+    data?.payments
+      ?.map((payment) => [
+        {
+          type: "text",
+          align: "center",
+          body: formatPrintRow(
+            payment.type + ":",
+            `${payment.total.toLocaleString()} so'm`
+          ),
+          font: "normal",
+        },
+        {
+          type: "text",
+          align: "center",
+          body: "",
+          font: "normal",
+        },
+      ])
+      .flat() || [];
+
+  return [
+    ...heading,
+    ...payments,
+    {
+      type: "text",
+      align: "center",
+      body: formatPrintRow(
+        "Jami:",
+        `${data.total_sum.toLocaleString()} so'm`,
+        21
+      ),
+      font: "bold",
+    },
+    {
+      type: "text",
+      align: "center",
+      body: "",
+      font: "normal",
+    },
+  ];
+};

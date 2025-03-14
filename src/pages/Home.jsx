@@ -13,16 +13,6 @@ const Home = () => {
   const [renderExit, setRenderExit] = useState(null);
 
   useEffect(() => {
-    const storedKpp = JSON.parse(localStorage.getItem("selectedKpp"));
-    const user = JSON.parse(sessionStorage.getItem("user"));
-    if (!storedKpp) {
-      navigate("/kpp");
-    } else if (!user) {
-      navigate("/cashiers");
-    }
-  }, []);
-
-  useEffect(() => {
     if (socketData?.kpp_id === kpps?.id) {
       if (socketData?.type === "enter") {
         setRenderEnter(socketData);

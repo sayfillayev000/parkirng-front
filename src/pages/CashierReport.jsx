@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import api from "../api/api";
 import { Link, useNavigate } from "react-router-dom";
+import { printCashierData } from "../utils/constants";
+import { toast, ToastContainer } from "react-toastify";
+import axios from "axios";
 
 const CashierReport = () => {
   const navigate = useNavigate();
@@ -25,9 +28,72 @@ const CashierReport = () => {
       </div>
     );
   }
-  const ReportPrint = () => {
-    window.print();
+  const showToast = (status) => {
+    const messages = {
+      200: {
+        type: "success",
+        message: "Chop etish muvaffaqiyatli amalga oshirildi!",
+      },
+      401: { type: "error", message: "Xatolik: Printerning qopqog'i ochiq!" },
+      402: {
+        type: "error",
+        message: "Xatolik: Printerning tugmasi bosilib turibdi!",
+      },
+      403: { type: "error", message: "Xatolik: Printerda qog'oz tugadi!" },
+      404: {
+        type: "warning",
+        message: "Printer topilmadi, qayta tekshirilmoqda...",
+      },
+      405: { type: "error", message: "Xatolik: Printerda noma'lum muammo!" },
+      406: {
+        type: "error",
+        message: "Xatolik: Printer ma'lumotlarda xatolik bor!",
+      },
+      407: {
+        type: "error",
+        message: "Xatolik: Printer JSON format noto'g'ri!",
+      },
+    };
+
+    const toastConfig = messages[status] || {
+      type: "error",
+      message: `Printerda xatolik. Status: ${status}`,
+    };
+
+    toast[toastConfig.type](toastConfig.message);
   };
+
+  const ReportPrint = async () => {
+    try {
+      const sendRequest = async () => {
+        return axios.post(
+          import.meta.env.VITE_PRINT_URL,
+          printCashierData(data),
+          {
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+      };
+
+      let response = await sendRequest();
+
+      if (response.status === 404) {
+        showToast(404);
+        response = await sendRequest();
+
+        if (response.status === 404) {
+          toast.error("Xatolik: Printer o'chiq yoki aloqa yo'q!");
+          return;
+        }
+      }
+
+      // ✅ Statusni bitta funksiya orqali boshqaramiz
+      showToast(response.status);
+    } catch (err) {
+      toast.error(`Chek chop etishda tarmoq yoki server xatosi`);
+    }
+  };
+
   return (
     <div className="container mx-auto p-6">
       <div className="flex justify-between items-center mb-4">
@@ -85,6 +151,7 @@ const CashierReport = () => {
           </tbody>
         </table>
       </div>
+      <ToastContainer />
     </div>
   );
 };

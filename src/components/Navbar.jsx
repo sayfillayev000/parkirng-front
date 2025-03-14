@@ -8,6 +8,16 @@ const Navbar = () => {
     JSON.parse(localStorage.getItem("selectedKpp"))
   );
 
+  useEffect(() => {
+    const storedKpp = JSON.parse(localStorage.getItem("selectedKpp"));
+    const user = JSON.parse(sessionStorage.getItem("user"));
+    if (!storedKpp) {
+      navigate("/kpp");
+    } else if (!user) {
+      navigate("/cashiers");
+    }
+  }, []);
+
   const logout = () => {
     sessionStorage.removeItem("user");
     window.location.reload();
