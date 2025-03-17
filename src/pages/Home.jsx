@@ -6,14 +6,15 @@ const env = import.meta.env;
 const WEBSOCKET_URL = `${env.VITE_WEBSOCKET_SCHEME}://${env.VITE_WEBSOCKET_HOST}:${env.VITE_WEBSOCKET_PORT}`;
 
 const Home = () => {
-  const navigate = useNavigate();
-  const [kpps, setKpps] = useState(null);
+  const [kpp, setKpp] = useState(
+    JSON.parse(localStorage.getItem("selectedKpp"))
+  );
   const [socketData, setSocketData] = useState(null);
   const [renderEnter, setRenderEnter] = useState(null);
   const [renderExit, setRenderExit] = useState(null);
 
   useEffect(() => {
-    if (socketData?.kpp_id === kpps?.id) {
+    if (socketData?.kpp_id === kpp?.id) {
       if (socketData?.type === "enter") {
         setRenderEnter(socketData);
       } else if (socketData?.type === "exit") {
@@ -23,7 +24,7 @@ const Home = () => {
   }, [socketData]);
 
   useEffect(() => {
-    if (!kpps) return;
+    if (!kpp) return;
 
     const connectWebSocket = () => {
       const websocket = new WebSocket(WEBSOCKET_URL);
@@ -32,7 +33,7 @@ const Home = () => {
 
       websocket.onmessage = (event) => {
         const data = JSON.parse(event.data);
-        if (data?.kpp_id == kpps?.id) {
+        if (data?.kpp_id == kpp?.id) {
           setSocketData(data);
         }
       };
@@ -52,7 +53,7 @@ const Home = () => {
 
     const wsInstance = connectWebSocket();
     return () => wsInstance.close();
-  }, [kpps]);
+  }, [kpp]);
 
   return (
     <>
