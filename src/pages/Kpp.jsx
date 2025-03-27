@@ -23,7 +23,11 @@ const Kpp = () => {
       .then((response) => setKpps(response.data))
       .catch((error) => {
         console.error("Error fetching KPPs:", error);
-        if (error?.code == "ERR_NETWORK" || error?.message == "Network Error") {
+        if (
+          error?.code == "ERR_NETWORK" ||
+          error?.message == "Network Error" ||
+          error?.code == "ECONNREFUSED"
+        ) {
           setError("Server bilan aloqa yo'q tarmoqqa ulanishni tekshiring");
         }
       });
@@ -39,7 +43,6 @@ const Kpp = () => {
   return (
     <div className="p-6">
       <a
-        href="#"
         onClick={(e) => {
           e.preventDefault();
           window.location.reload();

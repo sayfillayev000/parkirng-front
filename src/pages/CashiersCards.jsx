@@ -102,8 +102,9 @@ const CashiersCards = () => {
             onClick={() => setSelectedCashier(cashier)}
           >
             <div className="card-body">
-              <h2 className="card-title text-2xl">{cashier.name}</h2>
-              <h2 className="card-title text-2xl">Login: {cashier.login}</h2>
+              <h2 className="card-title text-2xl">
+                Kassir ismi: {cashier.name}
+              </h2>
             </div>
           </div>
         ))}

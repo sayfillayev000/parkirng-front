@@ -11,7 +11,7 @@ const PaymentType = (props) => {
       .get("exit_modes")
       .then((res) => {
         setExitMode(res.data);
-        setIsOpen(true);
+        setIsOpen(false);
         setError(null);
       })
       .catch((err) => {

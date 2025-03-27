@@ -63,7 +63,7 @@ const HomeRight = ({ renderExit }) => {
           setError("To'lov turini tanlang!");
           return;
         }
-        confirm(2);
+        confirm(2, false);
         break;
       default:
         setError("Noto'g'ri parametr");

@@ -42,7 +42,7 @@ const Home = () => {
         console.error("❌ WebSocket xatosi:", error);
 
       websocket.onclose = () => {
-        // console.log("🔄 WebSocket yopildi. 5 soniyadan keyin qayta ulanadi...");
+        console.log("🔄 WebSocket yopildi. 5 soniyadan keyin qayta ulanadi...");
         setTimeout(() => {
           connectWebSocket();
         }, 5000);
