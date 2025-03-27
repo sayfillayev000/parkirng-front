@@ -14,6 +14,9 @@ const SearchCar = () => {
   const [error, setError] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [showModal, setShowModal] = useState({ status: false, id: null });
+  const [kpp, setKpp] = useState(
+    JSON.parse(localStorage.getItem("selectedKpp"))
+  );
 
   const handleSearch = () => {
     if (!plate.trim()) {
@@ -50,7 +53,7 @@ const SearchCar = () => {
 
   const handleConfirm = () => {
     api
-      .post("allow_exit", { id: showModal.id })
+      .post(`allow_exit/${kpp.id}`, { id: showModal.id })
       .then((res) => {
         toast.success(res.data.message);
         console.log(res);

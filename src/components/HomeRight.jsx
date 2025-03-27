@@ -16,10 +16,13 @@ const HomeRight = ({ renderExit }) => {
   const [error, setError] = useState(null);
   const [network, setNetwork] = useState(null);
   const [data, setData] = useState(null);
+  const [kpp, setKpp] = useState(
+    JSON.parse(localStorage.getItem("selectedKpp"))
+  );
 
   useEffect(() => {
     setData(renderExit);
-    console.log(data);
+    console.log(renderExit);
   }, [renderExit]);
 
   useEffect(() => {
@@ -75,7 +78,7 @@ const HomeRight = ({ renderExit }) => {
   const confirm = (exit_mode_id, check) => {
     setIsLoading(true);
     api
-      .post("payment_confirm", {
+      .post(`payment_confirm`, {
         id: data?.id,
         payment_type: onChange,
         exit_mode_id,
@@ -99,7 +102,7 @@ const HomeRight = ({ renderExit }) => {
       })
       .catch((err) => {
         console.error(err);
-        setError(err.data.message);
+        setError(err.message);
         setIsOpen(false);
         if (err.code == "ERR_NETWORK") {
           setNetwork("Server bilan aloqa yo'q tarmoqqa ulanishni tekshiring");
@@ -117,23 +120,18 @@ const HomeRight = ({ renderExit }) => {
 
       let response = await sendRequest();
 
-      // Agar 404 bo‘lsa, faqat BIR MARTA yana so‘rov yuboramiz
       if (response.status === 404) {
         toast.warning("Printer topilmadi, qayta tekshirilmoqda...");
         response = await sendRequest();
 
-        // Agar yana 404 kelsa, aniq printer o‘chiq
         if (response.status === 404) {
           toast.error("Xatolik: Printer o'chiq yoki aloqa yo'q!");
           return;
         }
       }
-
-      // Statuslarni tekshiramiz
-      switch (response.status) {
-        case 200:
-          toast.success("Chop etish muvaffaqiyatli amalga oshirildi!");
-          break;
+      toast.success("Chop etish muvaffaqiyatli amalga oshirildi!");
+    } catch (err) {
+      switch (err.status) {
         case 401:
           toast.error("Xatolik: Printerning qopqog'i ochiq!");
           break;
@@ -142,6 +140,13 @@ const HomeRight = ({ renderExit }) => {
           break;
         case 403:
           toast.error("Xatolik: Printerda qog'oz tugadi!");
+          break;
+        case 404:
+          toast.warning("Printer topilmadi, qayta tekshirilmoqda...");
+          response = await sendRequest();
+          if (response.status == 404) {
+            toast.error("Xatolik: Printer o'chiq yoki aloqa yo'q!");
+          }
           break;
         case 405:
           toast.error("Xatolik: Printerda noma'lum muammo!");
@@ -153,10 +158,8 @@ const HomeRight = ({ renderExit }) => {
           toast.error("Xatolik: Printer JSON format noto'g'ri!");
           break;
         default:
-          toast.error(`Printerda xatolik. Status: ${response.status}`);
+          toast.error(`Printerda xatolik. Status: ${err.status}`);
       }
-    } catch (err) {
-      toast.error(`Chek chop etishda tarmoq yoki server xatosi`);
     }
   };
 
@@ -184,7 +187,7 @@ const HomeRight = ({ renderExit }) => {
       {isLoading && (
         <div className="flex justify-center items-center mt-4">
           <span className="loading loading-spinner loading-lg text-blue-500"></span>
-          <span className="ml-2 text-blue-500">Yuklanmoqda...</span>
+          <span className="ml-2 text-blue-500">Юкланмоқда...</span>
         </div>
       )}
 
@@ -201,7 +204,7 @@ const HomeRight = ({ renderExit }) => {
                 htmlFor="payType"
                 className="block mb-2 text-lg font-medium text-gray-700"
               >
-                Select Payment Type
+                Тўлов турини танланг
               </label>
               <select
                 id="payType"
@@ -212,7 +215,7 @@ const HomeRight = ({ renderExit }) => {
                            transition duration-200 text-xl"
               >
                 <option value="" selected>
-                  To'lovsiz
+                  Тўловсиз
                 </option>
                 {payType?.map((item) => (
                   <option key={item.id} value={item.id}>
@@ -229,7 +232,7 @@ const HomeRight = ({ renderExit }) => {
                 {isLoading ? (
                   <div className="w-5 h-5 border-2 border-t-2 border-gray-300 rounded-full animate-spin"></div>
                 ) : (
-                  "Shlagbaunni ochish (check bilan)"
+                  "Шлагбаунни очиш (ческ билан)"
                 )}
               </button>
               <button
@@ -239,7 +242,7 @@ const HomeRight = ({ renderExit }) => {
                 {isLoading ? (
                   <div className="w-5 h-5 border-2 border-t-2 border-gray-300 rounded-full animate-spin"></div>
                 ) : (
-                  "Shlagbaunni ochish (check siz)"
+                  "Шлагбаунни очиш (ческ сиз)"
                 )}
               </button>
               <button
@@ -249,17 +252,17 @@ const HomeRight = ({ renderExit }) => {
                 {isLoading ? (
                   <div className="w-5 h-5 border-2 border-t-2 border-gray-300 rounded-full animate-spin"></div>
                 ) : (
-                  "Xizmatda"
+                  "Хизматда"
                 )}
               </button>
               <button
-                onClick={() => {}}
+                onClick={() => setData(null)}
                 className="bg-blue-500 text-white px-4 py-2 rounded-lg cursor-pointer"
               >
                 {isLoading ? (
                   <div className="w-5 h-5 border-2 border-t-2 border-gray-300 rounded-full animate-spin"></div>
                 ) : (
-                  "Orqaga qaytib ketdi"
+                  "Орқага қайтиб кетди"
                 )}
               </button>
             </div>
@@ -269,8 +272,8 @@ const HomeRight = ({ renderExit }) => {
                 <tr className="bg-gray-200">
                   <th className="p-3 border">КИРИШ</th>
                   <th className="p-3 border">ЧИҚИШ</th>
-                  <th className="p-3 border">Summa</th>
-                  <th className="p-3 border">Minut</th>
+                  <th className="p-3 border">Сумма</th>
+                  <th className="p-3 border">Минут</th>
                 </tr>
               </thead>
               <tbody>
@@ -287,16 +290,16 @@ const HomeRight = ({ renderExit }) => {
           <table className="table-auto w-full border-collapse border border-gray-300 mt-4">
             <thead>
               <tr className="bg-gray-400">
-                <th className="border border-gray-300 px-4 py-2">Turi</th>
+                <th className="border border-gray-300 px-4 py-2">Тўлов</th>
                 <th className="border border-gray-300 px-4 py-2">
-                  Davlat raqami
+                  Давлат рақами
                 </th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 <td className="border border-gray-300 px-4 py-2">
-                  {data?.type}
+                  {data?.summa == 0 ? "Тўловсиз" : data?.summa}
                 </td>
                 <td className="border border-gray-300 px-4 py-2">
                   {data?.plate}
