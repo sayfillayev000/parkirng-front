@@ -91,7 +91,10 @@ export const printerData = (data) => [
   {
     type: "text",
     align: "center",
-    body: formatPrintRow("To'lov miqdori:", data.summa + " so'm"),
+    body: formatPrintRow(
+      "To'lov miqdori:",
+      `${data.summa.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} so'm`
+    ),
     font: "normal",
   },
   {
@@ -202,7 +205,13 @@ export const printCashierData = (data) => {
     {
       type: "text",
       align: "center",
-      body: formatPrintRow("Jami:", `${data.total_sum} so'm`, 21),
+      body: formatPrintRow(
+        "Jami:",
+        `${data.total_sum
+          .toString()
+          .replace(/\B(?=(\d{3})+(?!\d))/g, " ")} so'm`,
+        21
+      ),
       font: "bold",
     },
     {
