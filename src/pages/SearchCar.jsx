@@ -70,7 +70,7 @@ const SearchCar = () => {
       <Navbar />
       <div className="flex items-center justify-center h-[80%]">
         <div className="p-6">
-          <h1 className="text-3xl py-3 text-center">Avtomobilni Qidirish</h1>
+          <h1 className="text-3xl py-3 text-center">Автомобилни Қидириш</h1>
           <div className="max-w-lg mx-auto  bg-white p-6 rounded-lg shadow-xl w-3xl">
             <input
               type="text"
@@ -109,7 +109,7 @@ const SearchCar = () => {
               onClick={handleSearch}
               disabled={loading}
             >
-              {loading ? "Qidirilmoqda..." : "Qidirish"}
+              {loading ? "Қидирилмоқда..." : "Қидириш"}
             </button>
           </div>
         </div>
@@ -125,10 +125,10 @@ const SearchCar = () => {
               ✕
             </button>
             <h2 className="text-2xl font-bold mb-4 text-center">
-              Qidiruv natijalari
+              Қидирув натижалари
             </h2>
             {loading ? (
-              <p className="text-center text-lg">Yuklanmoqda...</p>
+              <p className="text-center text-lg">Юкланмоқда...</p>
             ) : cars.length > 0 ? (
               <ul className="flex flex-wrap gap-3">
                 {cars.map((car) => (
@@ -138,17 +138,21 @@ const SearchCar = () => {
                     className="p-4 border cursor-pointer rounded-md w-full md:w-1/4 lg:w-1/5 bg-gray-100 shadow-md transition duration-200 hover:bg-gray-200 hover:shadow-lg"
                   >
                     <p className="text-2xl">
-                      <strong>Raqam:</strong> {car.plate}
+                      <strong>Рақам:</strong> {car.plate}
                     </p>
                     <p>
-                      <strong>Kelgan vaqti:</strong> {car.enter_date}
+                      <strong>Келган вақти:</strong> {car.enter_date}
+                    </p>
+                    <p>
+                      <strong>Ҳудуддаги вақт:</strong>{" "}
+                      {car?.minutes ? car.minutes : "nomalum"}
                     </p>
                   </li>
                 ))}
               </ul>
             ) : (
               <p className="text-center text-lg text-red-600 font-bold">
-                Avtomobil topilmadi!
+                Автомобиль топилмади!
               </p>
             )}
           </div>

@@ -93,7 +93,7 @@ const CashiersCards = () => {
         </svg>
       </a>
       <h1 className="text-3xl py-4 text-center">{kpp?.parking?.name}</h1>
-      <h2 className="text-3xl font-bold mb-4 text-center">Kassirni tanlang</h2>
+      <h2 className="text-3xl font-bold mb-4 text-center">Кассирни танланг</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {cashiers.map((cashier) => (
           <div
@@ -103,7 +103,7 @@ const CashiersCards = () => {
           >
             <div className="card-body">
               <h2 className="card-title text-2xl">
-                Kassir ismi: {cashier.name}
+                Кассир исми: {cashier.name}
               </h2>
             </div>
           </div>
@@ -114,7 +114,7 @@ const CashiersCards = () => {
         <div className="fixed inset-0 flex items-center justify-center bg-blue-400 bg-opacity-30">
           <div className="bg-white p-10 rounded-2xl shadow-2xl w-[34rem]">
             <h2 className="text-3xl font-bold mb-4 text-center">
-              {selectedCashier.name} - Parolni kiriting
+              {selectedCashier.name} - Паролни киритинг
             </h2>
             <div className="relative mb-4">
               <input
@@ -164,13 +164,13 @@ const CashiersCards = () => {
                   setError("");
                 }}
               >
-                Orqaga
+                Орқага
               </button>
               <button
                 className="btn btn-success text-white text-2xl p-6"
                 onClick={handleLogin}
               >
-                Tasdiqlash
+                Тасдиқлаш
               </button>
             </div>
           </div>

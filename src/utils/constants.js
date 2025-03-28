@@ -91,10 +91,7 @@ export const printerData = (data) => [
   {
     type: "text",
     align: "center",
-    body: formatPrintRow(
-      "To'lov miqdori:",
-      `${data.summa.toLocaleString()} so'm`
-    ),
+    body: formatPrintRow("To'lov miqdori:", data.summa + " so'm"),
     font: "normal",
   },
   {
@@ -184,7 +181,9 @@ export const printCashierData = (data) => {
           align: "center",
           body: formatPrintRow(
             payment.type + ":",
-            `${payment.total.toLocaleString()} so'm`
+            `${payment.total
+              .toString()
+              .replace(/\B(?=(\d{3})+(?!\d))/g, " ")} so'm`
           ),
           font: "normal",
         },
@@ -203,11 +202,7 @@ export const printCashierData = (data) => {
     {
       type: "text",
       align: "center",
-      body: formatPrintRow(
-        "Jami:",
-        `${data.total_sum.toLocaleString()} so'm`,
-        21
-      ),
+      body: formatPrintRow("Jami:", `${data.total_sum} so'm`, 21),
       font: "bold",
     },
     {

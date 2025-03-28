@@ -3,22 +3,16 @@ import api from "../api/api";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
-import { PaymentType } from "./modal";
 import { printerData } from "../utils/constants";
 import axios from "axios";
 
 const HomeRight = ({ renderExit }) => {
   const [payType, setPayType] = useState(null);
   const [onChange, setOnChange] = useState(null);
-  const [isOpen, setIsOpen] = useState(false);
-
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [network, setNetwork] = useState(null);
   const [data, setData] = useState(null);
-  const [kpp, setKpp] = useState(
-    JSON.parse(localStorage.getItem("selectedKpp"))
-  );
 
   useEffect(() => {
     setData(renderExit);
@@ -48,46 +42,18 @@ const HomeRight = ({ renderExit }) => {
       .finally(() => setIsLoading(false));
   }, []);
 
-  // To'lovni tasdiqlash
-  const paymentConfirm = (key) => {
-    switch (key) {
-      case "service":
-        setIsOpen(true);
-        break;
-      case "check":
-        if (!onChange) {
-          setError("To'lov turini tanlang!");
-          return;
-        }
-        confirm(2, true);
-        break;
-      case "no_check":
-        if (!onChange) {
-          setError("To'lov turini tanlang!");
-          return;
-        }
-        confirm(2, false);
-        break;
-      default:
-        setError("Noto'g'ri parametr");
-        console.log("Noto'g'ri parametr");
-    }
-  };
-
-  // To'lovni tasdiqlash funksiyasi
   const confirm = (exit_mode_id, check) => {
     setIsLoading(true);
     api
       .post(`payment_confirm`, {
         id: data?.id,
-        payment_type: onChange,
+        payment_type: exit_mode_id == 2 ? onChange : null,
         exit_mode_id,
       })
       .then((res) => {
         console.log(res);
         toast.success(res.data.message);
         setError(null);
-        setIsOpen(false);
 
         if (res.status == 200) {
           console.log(200);
@@ -103,7 +69,6 @@ const HomeRight = ({ renderExit }) => {
       .catch((err) => {
         console.error(err);
         setError(err.message);
-        setIsOpen(false);
         if (err.code == "ERR_NETWORK") {
           setNetwork("Server bilan aloqa yo'q tarmoqqa ulanishni tekshiring");
         }
@@ -214,9 +179,6 @@ const HomeRight = ({ renderExit }) => {
                            focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent 
                            transition duration-200 text-xl"
               >
-                <option value="" selected>
-                  Тўловсиз
-                </option>
                 {payType?.map((item) => (
                   <option key={item.id} value={item.id}>
                     {item.type}
@@ -226,28 +188,55 @@ const HomeRight = ({ renderExit }) => {
             </div>
             <div className="flex gap-4 mt-4">
               <button
-                onClick={() => paymentConfirm("check")}
-                className="bg-blue-500 text-white px-4 py-2 rounded-lg cursor-pointer"
+                onClick={() => confirm(2, true)}
+                className="bg-blue-500 text-white  px-10 py-4 text-3xl rounded-lg cursor-pointer"
               >
                 {isLoading ? (
                   <div className="w-5 h-5 border-2 border-t-2 border-gray-300 rounded-full animate-spin"></div>
                 ) : (
-                  "Шлагбаунни очиш (ческ билан)"
+                  <>
+                    Шлагбаунни очиш <br /> (ческ билан)
+                  </>
                 )}
               </button>
               <button
-                onClick={() => paymentConfirm("no_check")}
-                className="bg-blue-500 text-white px-4 py-2 rounded-lg cursor-pointer"
+                onClick={() => confirm(2, false)}
+                className="bg-blue-500 text-white  px-10 py-4 text-3xl rounded-lg cursor-pointer"
               >
                 {isLoading ? (
                   <div className="w-5 h-5 border-2 border-t-2 border-gray-300 rounded-full animate-spin"></div>
                 ) : (
-                  "Шлагбаунни очиш (ческ сиз)"
+                  <>
+                    Шлагбаунни очиш <br /> (ческ сиз)
+                  </>
+                )}
+              </button>
+
+              <button
+                onClick={() => setData(null)}
+                className="bg-blue-500 text-white  px-10 py-4 text-3xl rounded-lg cursor-pointer"
+              >
+                {isLoading ? (
+                  <div className="w-5 h-5 border-2 border-t-2 border-gray-300 rounded-full animate-spin"></div>
+                ) : (
+                  "Орқага қайтиб кетди"
+                )}
+              </button>
+            </div>
+            <div className="flex gap-4 mt-4">
+              <button
+                onClick={() => confirm(5, false)}
+                className="bg-blue-500 text-white  px-10 py-4 text-3xl  rounded-lg cursor-pointer"
+              >
+                {isLoading ? (
+                  <div className="w-5 h-5 border-2 border-t-2 border-gray-300 rounded-full animate-spin"></div>
+                ) : (
+                  "Свои"
                 )}
               </button>
               <button
-                onClick={() => paymentConfirm("service")}
-                className="bg-blue-500 text-white px-4 py-2 rounded-lg cursor-pointer"
+                onClick={() => confirm(10, false)}
+                className="bg-blue-500 text-white  px-10 py-4 text-3xl rounded-lg cursor-pointer"
               >
                 {isLoading ? (
                   <div className="w-5 h-5 border-2 border-t-2 border-gray-300 rounded-full animate-spin"></div>
@@ -256,13 +245,13 @@ const HomeRight = ({ renderExit }) => {
                 )}
               </button>
               <button
-                onClick={() => setData(null)}
-                className="bg-blue-500 text-white px-4 py-2 rounded-lg cursor-pointer"
+                onClick={() => confirm(12, false)}
+                className="bg-blue-500 text-white  px-10 py-4 text-3xl rounded-lg cursor-pointer"
               >
                 {isLoading ? (
                   <div className="w-5 h-5 border-2 border-t-2 border-gray-300 rounded-full animate-spin"></div>
                 ) : (
-                  "Орқага қайтиб кетди"
+                  "Элестро заряд"
                 )}
               </button>
             </div>
@@ -322,16 +311,6 @@ const HomeRight = ({ renderExit }) => {
             </div>
           )}
         </>
-      )}
-
-      {isOpen && (
-        <PaymentType
-          setIsOpen={setIsOpen}
-          confirm={confirm}
-          setIsLoading={setIsLoading}
-          isLoading={isLoading}
-          setError={setError}
-        />
       )}
       <ToastContainer />
     </div>
