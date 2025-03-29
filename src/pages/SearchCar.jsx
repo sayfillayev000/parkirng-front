@@ -145,7 +145,7 @@ const SearchCar = () => {
                     </p>
                     <p>
                       <strong>Ҳудуддаги вақт:</strong>{" "}
-                      {car?.minutes ? car.minutes : "nomalum"}
+                      {car?.minutes ? car.minutes + " минут" : "nomalum"}
                     </p>
                   </li>
                 ))}
