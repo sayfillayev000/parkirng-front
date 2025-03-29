@@ -77,6 +77,9 @@ const CashierReport = () => {
 
       let response = await sendRequest();
 
+      // ✅ Statusni bitta funksiya orqali boshqaramiz
+      showToast(response.status);
+    } catch (err) {
       if (response.status === 404) {
         showToast(404);
         response = await sendRequest();
@@ -86,66 +89,61 @@ const CashierReport = () => {
           return;
         }
       }
-
-      // ✅ Statusni bitta funksiya orqali boshqaramiz
-      showToast(response.status);
-    } catch (err) {
-      toast.error(`Chek chop etishda tarmoq yoki server xatosi`);
     }
   };
 
   return (
     <div className="container mx-auto p-6">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold mb-4">Kassir Hisoboti</h2>
-        <Link className="btn btn-primary cursor-pointer" to="/">
-          Orqaga
+        <h2 className="text-3xl font-bold mb-4">Кассир Ҳисоботи</h2>
+        <Link className="btn btn-primary cursor-pointer text-lg" to="/">
+          Орқага
         </Link>
       </div>
 
       <button
         onClick={ReportPrint}
-        className="btn btn-success text-white m-4 cursor-pointer"
+        className="btn btn-success text-white m-4 cursor-pointer text-lg"
       >
         ХИСОБОТНИ ПЕЧАТЬ ҚИЛИШ
       </button>
+
       <div className="mb-4 p-4 border rounded shadow bg-white">
-        <p>
-          <strong>Ism:</strong> {data?.name}
+        <p className="text-4xl">
+          <strong>Исм:</strong> {data?.name}
         </p>
-        <p>
-          <strong>Roli:</strong> {data?.role}
+        <p className="text-4xl">
+          <strong>Лавозими:</strong> {data?.role == "cashier" && "Kassir"}
         </p>
-        <p>
-          <strong>Boshlanish sanasi:</strong> {data?.start_date}
+        <p className="text-4xl">
+          <strong>Бошланиш санаси:</strong> {data?.start_date}
         </p>
-        <p>
-          <strong>Hozirgi sana:</strong> {data?.now_date}
+        <p className="text-4xl">
+          <strong>Ҳозирги сана:</strong> {data?.now_date}
         </p>
-        <p>
-          <strong>Jami tushum:</strong> {data?.total_sum} so'm
+        <p className="text-4xl">
+          <strong>Жами тушум:</strong> {data?.total_sum} so'm
         </p>
       </div>
 
-      {/* Hisobot jadvali */}
       <div className="bg-white shadow-md rounded p-4">
-        <h3 className="text-xl font-semibold mb-3">To'lovlar</h3>
-        <table className="table w-full border">
+        <h3 className="text-2xl font-semibold mb-3">To'lovlar</h3>
+        <table className="table w-full border text-lg">
           <thead>
             <tr className="bg-gray-200">
               <th>#</th>
-              <th>Miqdor</th>
-              <th>To'lov turi</th>
-              <th>Sana</th>
+              <th>Миқдор</th>
+              <th>Тўлов тури</th>
+              <th>Сана</th>
             </tr>
           </thead>
           <tbody>
             {data?.payments?.map((payment, index) => (
               <tr key={payment.type}>
-                <td>{index + 1}</td>
-                <td>{payment?.total} so'm</td>
-                <td>{payment?.type}</td>
-                <td>{data?.now_date}</td>
+                <td className="text-5xl">{index + 1}</td>
+                <td className="text-5xl">{payment?.total} сўм</td>
+                <td className="text-5xl">{payment?.type}</td>
+                <td className="text-5xl">{data?.now_date}</td>
               </tr>
             ))}
           </tbody>

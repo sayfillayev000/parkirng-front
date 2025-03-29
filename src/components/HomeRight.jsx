@@ -8,7 +8,7 @@ import axios from "axios";
 
 const HomeRight = ({ renderExit }) => {
   const [payType, setPayType] = useState(null);
-  const [onChange, setOnChange] = useState(null);
+  const [onChange, setOnChange] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [network, setNetwork] = useState(null);
@@ -43,11 +43,17 @@ const HomeRight = ({ renderExit }) => {
   }, []);
 
   const confirm = (exit_mode_id, check) => {
-    setIsLoading(true);
+    // setIsLoading(true);
+    console.log({
+      id: data?.id,
+      pay_type_id: exit_mode_id == 2 ? onChange : null,
+      exit_mode_id,
+    });
+
     api
       .post(`payment_confirm`, {
         id: data?.id,
-        payment_type: exit_mode_id == 2 ? onChange : null,
+        pay_type_id: exit_mode_id == 2 ? onChange : null,
         exit_mode_id,
       })
       .then((res) => {
@@ -127,7 +133,13 @@ const HomeRight = ({ renderExit }) => {
       }
     }
   };
-
+  function convertMinutesToTimeFormat(minutes) {
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    return `${String(hours).padStart(2, "0")}:${String(
+      remainingMinutes
+    ).padStart(2, "0")}`;
+  }
   return (
     <div className="w-2/3 bg-white p-4 flex flex-col items-center rounded-lg shadow-md">
       <h1 className="text-2xl font-bold">ЧИҚИШ</h1>
@@ -164,7 +176,7 @@ const HomeRight = ({ renderExit }) => {
               ВАҚТ: {data?.minutes} минут ТЎЛОВ СУММАСИ:
               {data?.summa} сўм
             </h1>
-            <div className="w-full max-w-md">
+            <div className="w-full max-w-md transform scale-110">
               <label
                 htmlFor="payType"
                 className="block mb-2 text-lg font-medium text-gray-700"
@@ -176,8 +188,8 @@ const HomeRight = ({ renderExit }) => {
                 value={onChange || ""}
                 onChange={(e) => setOnChange(e.target.value)}
                 className="select select-bordered w-full rounded-lg bg-white border-gray-300 
-                           focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent 
-                           transition duration-200 text-xl"
+               focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent 
+               transition duration-200 text-2xl"
               >
                 {payType?.map((item) => (
                   <option key={item.id} value={item.id}>
@@ -186,6 +198,7 @@ const HomeRight = ({ renderExit }) => {
                 ))}
               </select>
             </div>
+
             <div className="flex gap-4 mt-4">
               <button
                 onClick={() => confirm(2, true)}
@@ -267,35 +280,59 @@ const HomeRight = ({ renderExit }) => {
               </thead>
               <tbody>
                 <tr className="text-center">
-                  <td className="p-3 border text-4xl">{data?.enter_date}</td>
-                  <td className="p-3 border text-4xl">{data?.exit_date}</td>
-                  <td className="p-3 border text-4xl">{data?.summa}</td>
-                  <td className="p-3 border text-4xl">{data?.minutes}</td>
+                  <td className="p-3 border text-5xl">{data?.enter_date}</td>
+                  <td className="p-3 border text-5xl">{data?.exit_date}</td>
+                  <td className="p-3 border text-5xl">{data?.summa}</td>
+                  <td className="p-3 border text-5xl">
+                    {convertMinutesToTimeFormat(data?.minutes)}
+                  </td>
                 </tr>
               </tbody>
             </table>
+            <div className="flex justify-around gap-5 items-center p-4 bg-gray-100 rounded-lg shadow-md mt-5">
+              <h1 className="text-2x font-semibold text-gray-700">
+                Автомобиль рақами
+              </h1>
+              <h1 className="text-4xl font-bold text-blue-600">
+                {data?.plate}
+              </h1>
+            </div>
           </>
         ) : (
-          <table className="table-auto w-full border-collapse border border-gray-300 mt-4">
-            <thead>
-              <tr className="bg-gray-400">
-                <th className="border border-gray-300 px-4 py-2">Тўлов</th>
-                <th className="border border-gray-300 px-4 py-2">
-                  Давлат рақами
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td className="border border-gray-300 px-4 py-2">
-                  {data?.summa == 0 ? "Тўловсиз" : data?.summa}
-                </td>
-                <td className="border border-gray-300 px-4 py-2">
-                  {data?.plate}
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <>
+            <table className="table-auto w-full border-collapse border border-gray-300 mt-4">
+              <thead>
+                <tr className="bg-gray-400">
+                  <th className="border border-gray-300 px-4 py-2">Тўлов</th>
+                  <th className="border border-gray-300 px-4 py-2">
+                    Давлат рақами
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td className="border border-gray-300 px-4 py-2">
+                    {data?.summa == 0
+                      ? data?.minutes <= 10
+                        ? "BEPUL VAQT"
+                        : "XIZMAT AVTO"
+                      : data?.summa}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2">
+                    {data?.plate}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div className="flex justify-around gap-5 items-center p-4 bg-gray-100 rounded-lg shadow-md mt-5">
+              <h1 className="text-2x font-semibold text-gray-700">
+                Автомобиль рақами
+              </h1>
+              <h1 className="text-4xl font-bold text-blue-600">
+                {data?.plate}
+              </h1>
+            </div>
+          </>
         )
       ) : (
         <>
