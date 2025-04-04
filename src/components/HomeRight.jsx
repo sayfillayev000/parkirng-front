@@ -8,6 +8,7 @@ import axios from "axios";
 
 const HomeRight = ({ renderExit }) => {
   const [payType, setPayType] = useState(null);
+  const [exitMode, setExitMode] = useState(null);
   const [onChange, setOnChange] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -40,10 +41,25 @@ const HomeRight = ({ renderExit }) => {
         setError(err.response.data.message);
       })
       .finally(() => setIsLoading(false));
+    api
+      .get("exit_modes")
+      .then((res) => {
+        setExitMode(res.data);
+        setError(null);
+      })
+      .catch((err) => {
+        if (err?.code == "ERR_NETWORK" || err?.message == "Network Error") {
+          console.log("aaaaa");
+          setNetwork("Server bilan aloqa yo'q tarmoqqa ulanishni tekshiring");
+        }
+        console.error(err);
+        setError(err.response.data.message);
+      })
+      .finally(() => setIsLoading(false));
   }, []);
 
   const confirm = (exit_mode_id, check) => {
-    // setIsLoading(true);
+    setIsLoading(true);
     console.log({
       id: data?.id,
       pay_type_id: exit_mode_id == 2 ? onChange : null,
@@ -199,7 +215,7 @@ const HomeRight = ({ renderExit }) => {
               </select>
             </div>
 
-            <div className="flex gap-4 mt-4">
+            <div className="flex flex-wrap gap-4 mt-4">
               <button
                 onClick={() => confirm(2, true)}
                 className="bg-blue-500 text-white  px-10 py-4 text-3xl rounded-lg cursor-pointer"
@@ -224,6 +240,19 @@ const HomeRight = ({ renderExit }) => {
                   </>
                 )}
               </button>
+              {exitMode.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => confirm(item.pay_status, false)}
+                  className="bg-blue-500 text-white  px-10 py-4 text-3xl rounded-lg cursor-pointer"
+                >
+                  {isLoading ? (
+                    <div className="w-5 h-5 border-2 border-t-2 border-gray-300 rounded-full animate-spin"></div>
+                  ) : (
+                    item?.name
+                  )}
+                </button>
+              ))}
 
               <button
                 onClick={() => setData(null)}
@@ -233,38 +262,6 @@ const HomeRight = ({ renderExit }) => {
                   <div className="w-5 h-5 border-2 border-t-2 border-gray-300 rounded-full animate-spin"></div>
                 ) : (
                   "Орқага қайтиб кетди"
-                )}
-              </button>
-            </div>
-            <div className="flex gap-4 mt-4">
-              <button
-                onClick={() => confirm(5, false)}
-                className="bg-blue-500 text-white  px-10 py-4 text-3xl  rounded-lg cursor-pointer"
-              >
-                {isLoading ? (
-                  <div className="w-5 h-5 border-2 border-t-2 border-gray-300 rounded-full animate-spin"></div>
-                ) : (
-                  "Свои"
-                )}
-              </button>
-              <button
-                onClick={() => confirm(10, false)}
-                className="bg-blue-500 text-white  px-10 py-4 text-3xl rounded-lg cursor-pointer"
-              >
-                {isLoading ? (
-                  <div className="w-5 h-5 border-2 border-t-2 border-gray-300 rounded-full animate-spin"></div>
-                ) : (
-                  "Хизматда"
-                )}
-              </button>
-              <button
-                onClick={() => confirm(12, false)}
-                className="bg-blue-500 text-white  px-10 py-4 text-3xl rounded-lg cursor-pointer"
-              >
-                {isLoading ? (
-                  <div className="w-5 h-5 border-2 border-t-2 border-gray-300 rounded-full animate-spin"></div>
-                ) : (
-                  "Элестро заряд"
                 )}
               </button>
             </div>

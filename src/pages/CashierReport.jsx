@@ -28,40 +28,6 @@ const CashierReport = () => {
       </div>
     );
   }
-  const showToast = (status) => {
-    const messages = {
-      200: {
-        type: "success",
-        message: "Chop etish muvaffaqiyatli amalga oshirildi!",
-      },
-      401: { type: "error", message: "Xatolik: Printerning qopqog'i ochiq!" },
-      402: {
-        type: "error",
-        message: "Xatolik: Printerning tugmasi bosilib turibdi!",
-      },
-      403: { type: "error", message: "Xatolik: Printerda qog'oz tugadi!" },
-      404: {
-        type: "warning",
-        message: "Printer topilmadi, qayta tekshirilmoqda...",
-      },
-      405: { type: "error", message: "Xatolik: Printerda noma'lum muammo!" },
-      406: {
-        type: "error",
-        message: "Xatolik: Printer ma'lumotlarda xatolik bor!",
-      },
-      407: {
-        type: "error",
-        message: "Xatolik: Printer JSON format noto'g'ri!",
-      },
-    };
-
-    const toastConfig = messages[status] || {
-      type: "error",
-      message: `Printerda xatolik. Status: ${status}`,
-    };
-
-    toast[toastConfig.type](toastConfig.message);
-  };
 
   const ReportPrint = async () => {
     try {
@@ -74,20 +40,37 @@ const CashierReport = () => {
           }
         );
       };
-
-      let response = await sendRequest();
-
-      // ✅ Statusni bitta funksiya orqali boshqaramiz
-      showToast(response.status);
+      sendRequest();
+      toast.success("Chop etish muvaffaqiyatli amalga oshirildi!");
     } catch (err) {
-      if (response.status === 404) {
-        showToast(404);
-        response = await sendRequest();
-
-        if (response.status === 404) {
-          toast.error("Xatolik: Printer o'chiq yoki aloqa yo'q!");
-          return;
-        }
+      switch (err.status) {
+        case 401:
+          toast.error("Xatolik: Printerning qopqog'i ochiq!");
+          break;
+        case 402:
+          toast.error("Xatolik: Printerning tugmasi bosilib turibdi!");
+          break;
+        case 403:
+          toast.error("Xatolik: Printerda qog'oz tugadi!");
+          break;
+        case 404:
+          toast.warning("Printer topilmadi, qayta tekshirilmoqda...");
+          response = await sendRequest();
+          if (response.status == 404) {
+            toast.error("Xatolik: Printer o'chiq yoki aloqa yo'q!");
+          }
+          break;
+        case 405:
+          toast.error("Xatolik: Printerda noma'lum muammo!");
+          break;
+        case 406:
+          toast.error("Xatolik: Printer ma'lumotlarda xatolik bor!");
+          break;
+        case 407:
+          toast.error("Xatolik: Printer JSON format noto'g'ri!");
+          break;
+        default:
+          toast.error(`Printerda xatolik. Status: ${err.status}`);
       }
     }
   };
