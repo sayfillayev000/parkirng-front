@@ -14,6 +14,10 @@ const HomeRight = ({ renderExit }) => {
   const [error, setError] = useState(null);
   const [network, setNetwork] = useState(null);
   const [data, setData] = useState(null);
+  const [parking, setParking] = useState(
+    JSON.parse(localStorage.getItem("selectedKpp"))?.parking
+  );
+  console.log(parking);
 
   useEffect(() => {
     setData(renderExit);
@@ -42,7 +46,7 @@ const HomeRight = ({ renderExit }) => {
       })
       .finally(() => setIsLoading(false));
     api
-      .get("exit_modes")
+      .get(`exit_modes/${parking.id}`)
       .then((res) => {
         setExitMode(res.data);
         setError(null);
