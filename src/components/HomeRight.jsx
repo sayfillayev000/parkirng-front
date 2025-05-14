@@ -5,23 +5,22 @@ import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import { printerData } from "../utils/constants";
 import axios from "axios";
+import BarcodeScanner from "./BarcodeScanner";
 
 const HomeRight = ({ renderExit }) => {
-  const [payType, setPayType] = useState(null);
   const [exitMode, setExitMode] = useState(null);
   const [onChange, setOnChange] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [network, setNetwork] = useState(null);
   const [data, setData] = useState(null);
+  const [isOpenQr, setIsOpenQr] = useState(false);
   const [parking, setParking] = useState(
     JSON.parse(localStorage.getItem("selectedKpp"))?.parking
   );
-  console.log(parking);
 
   useEffect(() => {
     setData(renderExit);
-    console.log(renderExit);
   }, [renderExit]);
 
   useEffect(() => {
@@ -30,21 +29,6 @@ const HomeRight = ({ renderExit }) => {
 
   useEffect(() => {
     setIsLoading(true);
-    api
-      .get("pay_types")
-      .then((res) => {
-        setPayType(res.data);
-        setError(null);
-      })
-      .catch((err) => {
-        if (err?.code == "ERR_NETWORK" || err?.message == "Network Error") {
-          console.log("aaaaa");
-          setNetwork("Server bilan aloqa yo'q tarmoqqa ulanishni tekshiring");
-        }
-        console.error(err);
-        setError(err.response.data.message);
-      })
-      .finally(() => setIsLoading(false));
     api
       .get(`exit_modes/${parking.id}`)
       .then((res) => {
@@ -62,19 +46,14 @@ const HomeRight = ({ renderExit }) => {
       .finally(() => setIsLoading(false));
   }, []);
 
-  const confirm = (exit_mode_id, check) => {
+  const confirm = (exit_mode_id, check, token) => {
     setIsLoading(true);
-    console.log({
-      id: data?.id,
-      pay_type_id: exit_mode_id == 2 ? onChange : null,
-      exit_mode_id,
-    });
 
     api
       .post(`payment_confirm`, {
         id: data?.id,
-        pay_type_id: exit_mode_id == 2 ? onChange : null,
         exit_mode_id,
+        token,
       })
       .then((res) => {
         console.log(res);
@@ -94,7 +73,7 @@ const HomeRight = ({ renderExit }) => {
       })
       .catch((err) => {
         console.error(err);
-        setError(err.message);
+        setError(err.response.data.message);
         if (err.code == "ERR_NETWORK") {
           setNetwork("Server bilan aloqa yo'q tarmoqqa ulanishni tekshiring");
         }
@@ -196,28 +175,6 @@ const HomeRight = ({ renderExit }) => {
               ВАҚТ: {data?.minutes} минут ТЎЛОВ СУММАСИ:
               {data?.summa} сўм
             </h1>
-            <div className="w-full max-w-md transform scale-110">
-              <label
-                htmlFor="payType"
-                className="block mb-2 text-lg font-medium text-gray-700"
-              >
-                Тўлов турини танланг
-              </label>
-              <select
-                id="payType"
-                value={onChange || ""}
-                onChange={(e) => setOnChange(e.target.value)}
-                className="select select-bordered w-full rounded-lg bg-white border-gray-300 
-               focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent 
-               transition duration-200 text-2xl"
-              >
-                {payType?.map((item) => (
-                  <option key={item.id} value={item.id}>
-                    {item.type}
-                  </option>
-                ))}
-              </select>
-            </div>
 
             <div className="flex flex-wrap gap-4 mt-4">
               <button
@@ -243,6 +200,12 @@ const HomeRight = ({ renderExit }) => {
                     Шлагбаунни очиш <br /> (ческ сиз)
                   </>
                 )}
+              </button>
+              <button
+                className="bg-blue-500 text-white  px-10 py-4 text-3xl rounded-lg cursor-pointer"
+                onClick={() => setIsOpenQr(true)}
+              >
+                Payme, Click, Uzum QR Code
               </button>
               {exitMode.map((item) => (
                 <button
@@ -276,7 +239,7 @@ const HomeRight = ({ renderExit }) => {
                   <th className="p-3 border">КИРИШ</th>
                   <th className="p-3 border">ЧИҚИШ</th>
                   <th className="p-3 border">Сумма</th>
-                  <th className="p-3 border">Минут</th>
+                  <th className="p-3 border">Соат</th>
                 </tr>
               </thead>
               <tbody>
@@ -349,6 +312,10 @@ const HomeRight = ({ renderExit }) => {
             </div>
           )}
         </>
+      )}
+
+      {isOpenQr && (
+        <BarcodeScanner setIsOpenQr={setIsOpenQr} confirm={confirm} />
       )}
       <ToastContainer />
     </div>
