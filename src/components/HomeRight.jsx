@@ -9,6 +9,7 @@ import BarcodeScanner from "./BarcodeScanner";
 
 const HomeRight = ({ renderExit }) => {
   const [exitMode, setExitMode] = useState(null);
+  const [payType, setPayType] = useState(null);
   const [onChange, setOnChange] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -44,15 +45,34 @@ const HomeRight = ({ renderExit }) => {
         setError(err.response.data.message);
       })
       .finally(() => setIsLoading(false));
-  }, []);
 
-  const confirm = (exit_mode_id, check, token) => {
+    setIsLoading(true);
+    api
+      .get("pay_types")
+      .then((res) => {
+        setPayType(res.data);
+        setError(null);
+      })
+      .catch((err) => {
+        if (err?.code == "ERR_NETWORK" || err?.message == "Network Error") {
+          console.log("aaaaa");
+          setNetwork("Server bilan aloqa yo'q tarmoqqa ulanishni tekshiring");
+        }
+        console.error(err);
+        setError(err.response.data.message);
+      })
+      .finally(() => setIsLoading(false));
+  }, []);
+  // console.log(payType);
+
+  const confirm = (exit_mode_id, pay_type_id, check, token) => {
     setIsLoading(true);
 
     api
       .post(`payment_confirm`, {
         id: data?.id,
         exit_mode_id,
+        pay_type_id,
         token,
       })
       .then((res) => {
@@ -143,7 +163,6 @@ const HomeRight = ({ renderExit }) => {
     <div className="w-2/3 bg-white p-4 flex flex-col items-center rounded-lg shadow-md">
       <h1 className="text-2xl font-bold">ЧИҚИШ</h1>
 
-      {/* ✅ Xato xabar */}
       {error && (
         <div
           onClick={() => setError(null)}
@@ -159,7 +178,6 @@ const HomeRight = ({ renderExit }) => {
         </div>
       )}
 
-      {/* ✅ Yuklanish jarayoni */}
       {isLoading && (
         <div className="flex justify-center items-center mt-4">
           <span className="loading loading-spinner loading-lg text-blue-500"></span>
@@ -167,7 +185,6 @@ const HomeRight = ({ renderExit }) => {
         </div>
       )}
 
-      {/* ✅ Ma'lumotni ko'rsatish */}
       {data ? (
         data?.summa ? (
           <>
@@ -177,40 +194,25 @@ const HomeRight = ({ renderExit }) => {
             </h1>
 
             <div className="flex flex-wrap gap-4 mt-4">
-              <button
-                onClick={() => confirm(2, true)}
-                className="bg-blue-500 text-white  px-10 py-4 text-3xl rounded-lg cursor-pointer"
-              >
-                {isLoading ? (
-                  <div className="w-5 h-5 border-2 border-t-2 border-gray-300 rounded-full animate-spin"></div>
-                ) : (
-                  <>
-                    Шлагбаунни очиш <br /> (ческ билан)
-                  </>
-                )}
-              </button>
-              <button
-                onClick={() => confirm(2, false)}
-                className="bg-blue-500 text-white  px-10 py-4 text-3xl rounded-lg cursor-pointer"
-              >
-                {isLoading ? (
-                  <div className="w-5 h-5 border-2 border-t-2 border-gray-300 rounded-full animate-spin"></div>
-                ) : (
-                  <>
-                    Шлагбаунни очиш <br /> (ческ сиз)
-                  </>
-                )}
-              </button>
-              <button
+              {payType?.map((item) => (
+                <button
+                  onClick={() => confirm(2, item.id, false)}
+                  className="bg-blue-500 text-white  px-10 py-4 text-3xl rounded-lg cursor-pointer"
+                >
+                  {item.type}
+                </button>
+              ))}
+
+              {/* <button
                 className="bg-blue-500 text-white  px-10 py-4 text-3xl rounded-lg cursor-pointer"
                 onClick={() => setIsOpenQr(true)}
               >
                 Payme, Click, Uzum QR Code
-              </button>
-              {exitMode.map((item) => (
+              </button> */}
+              {exitMode?.map((item) => (
                 <button
                   key={item.id}
-                  onClick={() => confirm(item.pay_status, false)}
+                  onClick={() => confirm(item.id, null, false)}
                   className="bg-blue-500 text-white  px-10 py-4 text-3xl rounded-lg cursor-pointer"
                 >
                   {isLoading ? (

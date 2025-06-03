@@ -1,8 +1,18 @@
 import React, { useEffect, useState } from "react";
 import api from "../api/api";
+import { toast } from "react-toastify";
 
 const HomeLeft = ({ renderEnter }) => {
   const [data, setData] = useState(null);
+  const [render, setRender] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [network, setNetwork] = useState(null);
+
+  useEffect(() => {
+    setRender(renderEnter);
+  }, [renderEnter]);
+
   useEffect(() => {
     const kpp = JSON.parse(localStorage.getItem("selectedKpp"));
     if (!kpp) return;
@@ -12,11 +22,62 @@ const HomeLeft = ({ renderEnter }) => {
       .then((res) => setData(res.data))
       .catch((err) => console.error(err));
   }, [renderEnter]);
-
+  const openBarier = () => {
+    api
+      .post(`open_barier/${render?.device_log_id}`)
+      .then((res) => {
+        console.log(res);
+        toast.success(res.data.message);
+        setError(null);
+        if (res.status == 200) {
+          console.log(200);
+          setRender(null);
+        }
+      })
+      .catch((err) => {
+        if (err?.code == "ERR_NETWORK" || err?.message == "Network Error") {
+          console.log("aaaaa");
+          setNetwork("Server bilan aloqa yo'q tarmoqqa ulanishni tekshiring");
+        }
+        console.error(err);
+        setError(err.response.data.message);
+      })
+      .finally(() => setIsLoading(false));
+  };
   return (
     <div className="w-1/3 bg-gray-100 p-4 flex flex-col items-center text-center rounded-lg shadow-md">
       <h1 className="text-2xl font-bold">КИРИШ</h1>
-      {renderEnter && (
+
+      {network && (
+        <div className=" flex justify-center pt-5">
+          <div className="text-red-500 bg-red-100 p-3 w-2xl text-center rounded-lg mb-4">
+            ❌ {network}
+          </div>
+        </div>
+      )}
+
+      {error && (
+        <div
+          onClick={() => setError(null)}
+          className="text-red-500 bg-red-100 p-2 mt-2 w-full rounded-md border border-red-300 flex items-center justify-between"
+        >
+          <p>{error}</p>
+          <button
+            onClick={() => setError(null)}
+            className="text-gray-400 hover:text-gray-600"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
+      {isLoading && (
+        <div className="flex justify-center items-center mt-4">
+          <span className="loading loading-spinner loading-lg text-blue-500"></span>
+          <span className="ml-2 text-blue-500">Юкланмоқда...</span>
+        </div>
+      )}
+      {render && (
         <table className="table-auto w-full border-collapse border border-gray-300 mt-4">
           <thead>
             <tr className="bg-gray-200">
@@ -29,10 +90,15 @@ const HomeLeft = ({ renderEnter }) => {
           <tbody>
             <tr>
               <td className="border border-gray-300 px-4 py-2">
-                {renderEnter?.plate}
+                {render?.plate}
               </td>
               <td className="border border-gray-300 px-4 py-2">
-                {renderEnter?.message}
+                <button
+                  onClick={openBarier}
+                  className="bg-blue-500 text-white  px-10 py-4 text-3xl rounded-lg cursor-pointer"
+                >
+                  КИРИТИШ
+                </button>
               </td>
             </tr>
           </tbody>
