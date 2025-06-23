@@ -18,7 +18,8 @@ const HomeLeft = () => {
       .get(`get_latest_device_logs?limit=10&kpp_id=${kpp_id}`)
       .then((res) => setData(res.data))
       .catch((err) => console.error(err));
-  }, []);
+  }, [renderEnter]);
+
   const openBarier = () => {
     api
       .post(`open_barier/${renderEnter?.device_log_id}`)
@@ -90,7 +91,7 @@ const HomeLeft = () => {
               <th className="border border-gray-300 px-4 py-2">Xabar</th>
             </tr>
           </thead>
-          <tbody>
+          {/* <tbody>
             <tr>
               <td className="border border-gray-300 px-4 py-2">
                 {renderEnter?.plate}
@@ -104,7 +105,7 @@ const HomeLeft = () => {
                 </button>
               </td>
             </tr>
-          </tbody>
+          </tbody> */}
         </table>
       )}
       <div className="overflow-x-auto mt-8 w-full">
