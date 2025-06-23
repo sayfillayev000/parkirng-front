@@ -1,6 +1,7 @@
 import { createHashRouter, RouterProvider } from "react-router-dom";
 import { CashierReport, CashiersCards, Error, Kpp, SearchCar } from "./pages";
 import Home from "./pages/Home";
+import useWebSocket from "./hooks/useWebSocket";
 
 const router = createHashRouter([
   { path: "/", element: <Home />, errorElement: <Error /> },
@@ -22,6 +23,9 @@ const router = createHashRouter([
   },
 ]);
 
-const App = () => <RouterProvider router={router} />;
+const App = () => {
+  useWebSocket();
+  return <RouterProvider router={router} />;
+};
 
 export default App;

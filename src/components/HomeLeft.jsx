@@ -1,37 +1,40 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import api from "../api/api";
 import { toast } from "react-toastify";
+import { WebsocketContext } from "../context/WebsocketContext";
 
-const HomeLeft = ({ renderEnter }) => {
+const HomeLeft = () => {
+  const { state, dispatch } = useContext(WebsocketContext);
+  const renderEnter = state.renderEnter;
   const [data, setData] = useState(null);
-  const [render, setRender] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [network, setNetwork] = useState(null);
-
+  const [kpp_id, setKppId] = useState(
+    JSON.parse(localStorage.getItem("selectedKpp"))?.id
+  );
   useEffect(() => {
-    setRender(renderEnter);
-  }, [renderEnter]);
-
-  useEffect(() => {
-    const kpp = JSON.parse(localStorage.getItem("selectedKpp"));
-    if (!kpp) return;
-
     api
-      .get(`get_latest_device_logs?limit=10&kpp_id=${kpp.id}`)
+      .get(`get_latest_device_logs?limit=10&kpp_id=${kpp_id}`)
       .then((res) => setData(res.data))
       .catch((err) => console.error(err));
-  }, [renderEnter]);
+  }, []);
   const openBarier = () => {
     api
-      .post(`open_barier/${render?.device_log_id}`)
+      .post(`open_barier/${renderEnter?.device_log_id}`)
       .then((res) => {
         console.log(res);
         toast.success(res.data.message);
         setError(null);
         if (res.status == 200) {
-          console.log(200);
-          setRender(null);
+          dispatch({
+            type: "renderEnter",
+            payload: null,
+          });
+          api
+            .get(`get_latest_device_logs?limit=10&kpp_id=${kpp_id}`)
+            .then((res) => setData(res.data))
+            .catch((err) => console.error(err));
         }
       })
       .catch((err) => {
@@ -77,7 +80,7 @@ const HomeLeft = ({ renderEnter }) => {
           <span className="ml-2 text-blue-500">Юкланмоқда...</span>
         </div>
       )}
-      {render && (
+      {renderEnter && (
         <table className="table-auto w-full border-collapse border border-gray-300 mt-4">
           <thead>
             <tr className="bg-gray-200">
@@ -90,7 +93,7 @@ const HomeLeft = ({ renderEnter }) => {
           <tbody>
             <tr>
               <td className="border border-gray-300 px-4 py-2">
-                {render?.plate}
+                {renderEnter?.plate}
               </td>
               <td className="border border-gray-300 px-4 py-2">
                 <button
@@ -112,7 +115,7 @@ const HomeLeft = ({ renderEnter }) => {
               <tr key={item.id} className="hover:bg-gray-50">
                 <td className="border border-gray-300 px-4 py-2 text-2xl text-center">
                   {item.plate} <br />
-                  {item.event_date}
+                  {item.enter_date}
                 </td>
               </tr>
             ))}

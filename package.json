@@ -25,7 +25,7 @@
       "preload.js"
     ],
     "win": {
-      "target": "nsis",
+      "target": "portable",
       "icon": "assets/icon.png",
       "sign": false,
       "forceCodeSigning": false
@@ -42,7 +42,10 @@
       "icon": "build/icon.icns"
     },
     "linux": {
-      "target": "AppImage",
+      "target": [
+        "snap",
+        "deb"
+      ],
       "icon": "build/icon.png"
     }
   },

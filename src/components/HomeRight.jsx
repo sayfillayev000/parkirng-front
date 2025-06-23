@@ -1,28 +1,23 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import api from "../api/api";
 import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import { ToastContainer } from "react-toastify";
 import { printerData } from "../utils/constants";
 import axios from "axios";
 import BarcodeScanner from "./BarcodeScanner";
+import { WebsocketContext } from "../context/WebsocketContext";
 
-const HomeRight = ({ renderExit }) => {
+const HomeRight = () => {
+  const { state, dispatch } = useContext(WebsocketContext);
+  const renderExit = state.renderExit;
   const [exitMode, setExitMode] = useState(null);
   const [payType, setPayType] = useState(null);
-  const [onChange, setOnChange] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [network, setNetwork] = useState(null);
-  const [data, setData] = useState(null);
   const [isOpenQr, setIsOpenQr] = useState(false);
   const [parking, setParking] = useState(
     JSON.parse(localStorage.getItem("selectedKpp"))?.parking
   );
-
-  useEffect(() => {
-    setData(renderExit);
-  }, [renderExit]);
 
   useEffect(() => {
     toast.error(error);
@@ -63,14 +58,13 @@ const HomeRight = ({ renderExit }) => {
       })
       .finally(() => setIsLoading(false));
   }, []);
-  // console.log(payType);
 
-  const confirm = (exit_mode_id, pay_type_id, check, token) => {
+  const confirm = (exit_mode_id, pay_type_id, token) => {
     setIsLoading(true);
 
     api
       .post(`payment_confirm`, {
-        id: data?.id,
+        id: renderExit?.id,
         exit_mode_id,
         pay_type_id,
         token,
@@ -82,13 +76,10 @@ const HomeRight = ({ renderExit }) => {
 
         if (res.status == 200) {
           console.log(200);
-
-          if (check) {
-            console.log("check");
-
-            handlePrint();
-          }
-          setData(null);
+          dispatch({
+            type: "renderExit",
+            payload: null,
+          });
         }
       })
       .catch((err) => {
@@ -103,9 +94,13 @@ const HomeRight = ({ renderExit }) => {
   const handlePrint = async () => {
     try {
       const sendRequest = async () => {
-        return axios.post(import.meta.env.VITE_PRINT_URL, printerData(data), {
-          headers: { "Content-Type": "application/json" },
-        });
+        return axios.post(
+          import.meta.env.VITE_PRINT_URL,
+          printerData(renderExit),
+          {
+            headers: { "Content-Type": "application/json" },
+          }
+        );
       };
 
       let response = await sendRequest();
@@ -185,34 +180,31 @@ const HomeRight = ({ renderExit }) => {
         </div>
       )}
 
-      {data ? (
-        data?.summa ? (
+      {renderExit ? (
+        renderExit?.summa ? (
           <>
             <h1>
-              ВАҚТ: {data?.minutes} минут ТЎЛОВ СУММАСИ:
-              {data?.summa} сўм
+              ВАҚТ: {renderExit?.minutes} минут ТЎЛОВ СУММАСИ:
+              {renderExit?.summa} сўм
             </h1>
 
             <div className="flex flex-wrap gap-4 mt-4">
               {payType?.map((item) => (
                 <button
-                  onClick={() => confirm(2, item.id, false)}
+                  key={item.id}
+                  onClick={() =>
+                    item.id == 4 ? setIsOpenQr(true) : confirm(2, item.id)
+                  }
                   className="bg-blue-500 text-white  px-10 py-4 text-3xl rounded-lg cursor-pointer"
                 >
                   {item.type}
                 </button>
               ))}
 
-              {/* <button
-                className="bg-blue-500 text-white  px-10 py-4 text-3xl rounded-lg cursor-pointer"
-                onClick={() => setIsOpenQr(true)}
-              >
-                Payme, Click, Uzum QR Code
-              </button> */}
               {exitMode?.map((item) => (
                 <button
                   key={item.id}
-                  onClick={() => confirm(item.id, null, false)}
+                  onClick={() => confirm(item.id, null)}
                   className="bg-blue-500 text-white  px-10 py-4 text-3xl rounded-lg cursor-pointer"
                 >
                   {isLoading ? (
@@ -224,7 +216,7 @@ const HomeRight = ({ renderExit }) => {
               ))}
 
               <button
-                onClick={() => setData(null)}
+                onClick={() => dispatch({ type: "renderExit", payload: null })}
                 className="bg-blue-500 text-white  px-10 py-4 text-3xl rounded-lg cursor-pointer"
               >
                 {isLoading ? (
@@ -246,11 +238,15 @@ const HomeRight = ({ renderExit }) => {
               </thead>
               <tbody>
                 <tr className="text-center">
-                  <td className="p-3 border text-5xl">{data?.enter_date}</td>
-                  <td className="p-3 border text-5xl">{data?.exit_date}</td>
-                  <td className="p-3 border text-5xl">{data?.summa}</td>
                   <td className="p-3 border text-5xl">
-                    {convertMinutesToTimeFormat(data?.minutes)}
+                    {renderExit?.enter_date}
+                  </td>
+                  <td className="p-3 border text-5xl">
+                    {renderExit?.exit_date}
+                  </td>
+                  <td className="p-3 border text-5xl">{renderExit?.summa}</td>
+                  <td className="p-3 border text-5xl">
+                    {convertMinutesToTimeFormat(renderExit?.minutes)}
                   </td>
                 </tr>
               </tbody>
@@ -260,7 +256,7 @@ const HomeRight = ({ renderExit }) => {
                 Автомобиль рақами
               </h1>
               <h1 className="text-4xl font-bold text-blue-600">
-                {data?.plate}
+                {renderExit?.plate}
               </h1>
             </div>
           </>
@@ -273,19 +269,23 @@ const HomeRight = ({ renderExit }) => {
                   <th className="border border-gray-300 px-4 py-2">
                     Давлат рақами
                   </th>
+                  <th className="border border-gray-300 px-4 py-2">Хабар</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
                   <td className="border border-gray-300 px-4 py-2">
-                    {data?.summa == 0
-                      ? data?.minutes <= 10
+                    {renderExit?.summa == 0
+                      ? renderExit?.minutes <= 10
                         ? "BEPUL VAQT"
                         : "XIZMAT AVTO"
-                      : data?.summa}
+                      : renderExit?.summa}
                   </td>
                   <td className="border border-gray-300 px-4 py-2">
-                    {data?.plate}
+                    {renderExit?.plate}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2">
+                    {renderExit?.message}
                   </td>
                 </tr>
               </tbody>
@@ -295,7 +295,7 @@ const HomeRight = ({ renderExit }) => {
                 Автомобиль рақами
               </h1>
               <h1 className="text-4xl font-bold text-blue-600">
-                {data?.plate}
+                {renderExit?.plate}
               </h1>
             </div>
           </>
@@ -319,7 +319,6 @@ const HomeRight = ({ renderExit }) => {
       {isOpenQr && (
         <BarcodeScanner setIsOpenQr={setIsOpenQr} confirm={confirm} />
       )}
-      <ToastContainer />
     </div>
   );
 };

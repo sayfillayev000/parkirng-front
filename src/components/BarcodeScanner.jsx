@@ -7,7 +7,7 @@ function BarcodeScanner({ setIsOpenQr, confirm }) {
       suffixKeyCodes: [13],
       onScan: (code) => {
         setIsOpenQr(false);
-        confirm(null, false, code);
+        confirm(2, 4, code);
       },
     });
 
