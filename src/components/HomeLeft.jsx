@@ -91,21 +91,16 @@ const HomeLeft = () => {
               <th className="border border-gray-300 px-4 py-2">Xabar</th>
             </tr>
           </thead>
-          {/* <tbody>
+          <tbody>
             <tr>
               <td className="border border-gray-300 px-4 py-2">
                 {renderEnter?.plate}
               </td>
               <td className="border border-gray-300 px-4 py-2">
-                <button
-                  onClick={openBarier}
-                  className="bg-blue-500 text-white  px-10 py-4 text-3xl rounded-lg cursor-pointer"
-                >
-                  КИРИТИШ
-                </button>
+                {renderEnter?.message}
               </td>
             </tr>
-          </tbody> */}
+          </tbody>
         </table>
       )}
       <div className="overflow-x-auto mt-8 w-full">
