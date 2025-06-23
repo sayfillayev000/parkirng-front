@@ -17,6 +17,9 @@
   "build": {
     "appId": "com.parking.electron-app",
     "productName": "Parking",
+    "asarUnpack": [
+      "dist/**"
+    ],
     "directories": {
       "output": "release"
     },
