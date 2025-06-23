@@ -1,5 +1,6 @@
 {
-  "name": "parking-front",
+  "name": "bg-parking",
+  "author": "bgparkin@gemail.com",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -22,14 +23,9 @@
     "files": [
       "dist/**/*",
       "main.cjs",
-      "preload.js"
+      "preload.js",
+      "public/assets/icon.png"
     ],
-    "win": {
-      "target": "portable",
-      "icon": "assets/icon.png",
-      "sign": false,
-      "forceCodeSigning": false
-    },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
@@ -37,16 +33,22 @@
       "allowElevation": true,
       "deleteAppDataOnUninstall": true
     },
+    "win": {
+      "target": "portable",
+      "icon": "public/assets/icon.png",
+      "sign": false,
+      "forceCodeSigning": false
+    },
     "mac": {
       "target": "dmg",
-      "icon": "build/icon.icns"
+      "icon": "public/assets/icon.icns"
     },
     "linux": {
       "target": [
         "snap",
         "deb"
       ],
-      "icon": "build/icon.png"
+      "icon": "public/assets/icon.png"
     }
   },
   "dependencies": {
